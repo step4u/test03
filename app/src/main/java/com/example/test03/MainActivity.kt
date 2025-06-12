@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -18,13 +19,15 @@ import java.io.*
 import java.util.zip.ZipFile
 
 class MainActivity : ComponentActivity() {
+    private val lifecycleScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
     private var resultText by mutableStateOf("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // 앱 시작 시 필요한 파일들을 설치
-        installRequiredFiles()
+        installRequiredFiles(this)
 
         setContent {
             Column(
@@ -52,7 +55,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun installRequiredFiles() {
+    private fun installRequiredFiles(context: MainActivity) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 // Perl 설치
